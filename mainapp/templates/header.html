@@ -1,0 +1,57 @@
+{% load static %}
+{% load sass_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes" />
+    <title>NaUKMA Startups</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Condensed&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% sass_src 'style.scss' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js" integrity="sha512-Meww2sXqNHxI1+5Dyh/9KAtvI9RZSA4c1K2k5iL02oiPO/RH3Q30L3M1albtqMg50u4gRTYdV4EXOQqXEI336A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{% static 'script.js' %}"></script>
+</head>
+<body>
+    <div id="page-loading">
+        <div class="d-flex flex-column justify-content-center align-items-center">
+            <img src="{% static 'loading.gif' %}" width="200px">
+            <p class="text-center mt-3">Сторінка завантажується...</p>
+        </div>
+    </div>
+    <div id="scroll-top" class="justify-content-center align-items-center"><i class="bi bi-chevron-up"></i></div>
+    <header id="header">
+        <div class="d-flex navbar light" id="navbar">
+            <nav class="desctop-menu">
+                <a href="/" class="logo-link">
+                    <div class="logo">
+                        <img src="{% static 'logo.png' %}" width="50px">
+                        <p>Startups NaUKMA</p>
+                    </div>
+                </a>
+                <a href="/">Головна</a>
+                <a href="/startups/">Стартапи</a>
+                <a href="/posts/">Новини</a>
+                <a href="#">Допомога</a>
+            </nav>
+            <i class="bi bi-list"></i>
+            <nav class="mobile-menu">
+                <a href="/">Головна</a>
+                <a href="startups/">Стартапи</a>
+                <a href="posts/">Новини</a>
+                <a href="#">Допомога</a>
+            </nav>
+            <div>
+                <a class="btn btn-warning" href=""><i class="bi bi-door-open me-2"></i>Увійти</a>
+            </div>
+            <div id="site-loading"></div>
+        </div>
+    </header>

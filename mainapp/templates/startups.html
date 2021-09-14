@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section id="startups-section" navbar-theme="light">
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="breadcrumbs p-3">
+                <a href="/"><i class="bi bi-house-door"></i></a>
+                <span class="breadcrumb-delimiter"><i class="bi bi-caret-right-fill"></i></span>
+                <a class="inactive">Стартапи</a>
+            </nav>
+        </div>
+        <div class="row py-4 mt-2 px-1">
+            <h2>Список доступних стартапів</h2>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="settings-panel d-flex flex-wrap justify-content-center">
+                    <div class="sorting p-1">
+                        <a class="btn btn-warning"><i class="bi bi-funnel me-2"></i>Сортувати</a>
+                    </div>
+                    <div class="filters p-1">
+                        <a class="btn btn-warning"><i class="bi bi-gear me-2"></i>Фільтри</a>
+                    </div>
+                    <div class="search w-100 p-1">
+                        <form action="POST" class="w-100">
+                            {% csrf_token %}
+                            <div class="form-group w-100 p-0">
+                                <span class="field-before bg-dark text-light"><i class="bi bi-search me-3"></i>Пошук</span>
+                                <input type="text" class="w-100 advanced-right advanced-left" placeholder="Введіть текст для пошуку...">
+                                <span class="field-after bg-dark text-light"><i class="bi bi-search"></i></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4 pb-5 g-3 align-items-stretch justify-content-center startups-list">
+            {% for startup in startups %}
+                <div class="col-12 col-lg-6 col-xxl-4">
+                    <div class="cu-card h-100">
+                        <div class="header">
+                            <div class="startup-status">
+                                {{ startup.status_name }}
+                                <i class="bi bi-person-bounding-box ms-2"></i> x {{ startup.members.count }}
+                            </div>
+                            <img src="{% if not startup.image %}{% static 'startup-default.png' %}{% else %}{{ startup.image.url }}{% endif %}">
+                            <div class="header-info d-flex justify-content-between mt-3 flex-wrap">
+                                <div class="w-100 mb-3 title">
+                                    <h3 class="d-flex align-items-center">{{ startup.name }}</h3>
+                                </div>
+                                <div class="startup-tags col-12 col-md-8">
+                                    {% for startup_category in startup.categories.all %}
+                                        <span>{{ startup_category.name }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="budget col-12 col-md-4">
+                                    <p>Зібрано коштів: <span>{{ startup.budget }} грн.</span></p>
+                                </div>
+                                <div class="followers w-100 col-12">
+                                    <p>Кількість підписників: <span class="me-2 badge bg-light p-2" id="startup-{{ startup.id }}-followers">{{ startup.followers.count }}</span> {% if request.user in startup.followers.all %}(<i class="bi bi-person-check-fill px-1"></i> Ви підписані){% endif %}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="body pt-3">
+                            <p>{{ startup.short_description }}</p>
+                        </div>
+                        <div class="footer pt-3 d-flex flex-column">
+                            <div class="ft-row row gx-2 flex-wrap">
+                                <div class="col-12 col-md-6 d-flex mt-2">
+                                    <a class="btn btn-secondary w-100" href="{{ startup.get_absolute_url }}">Детальніше</a>
+                                </div>
+                                <div class="col-12 col-md-6 d-flex mt-2">
+                                    <a class="btn btn-warning w-100">Приєднатися до команди</a>
+                                </div>
+                            </div>
+                            <div class="ft-row row gx-2 flex-wrap">
+                                <div class="col-12 col-md-6 d-flex mt-2">
+                                    <a class="btn {% if request.user not in startup.followers.all %}btn-primary{% else %}btn-light{% endif %} w-100 follow-link" reference="{% url 'follow_startup' slug=startup.slug %}" startup-id="startup-{{ startup.id }}-followers">
+                                        {% if request.user not in startup.followers.all %}
+                                            Підписатися
+                                        {% else %}
+                                            Відписатися
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <div class="col-12 col-md-6 d-flex mt-2">
+                                    <a class="btn btn-success w-100">Зробити пожертву $</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="row pb-5">
+            <div class="col-12">
+                <div class="pagination">
+                    <nav>
+                        <a class="btn btn-dark {% if not page.has_previous %} disabled {% endif %}"
+                            {% if page.has_previous %}
+                                href="
+                                    {% if page.previous_page_number is not 1 %}
+                                        {% url 'startup_list' page=previous_page_number %}
+                                    {% else %}
+                                        {% url 'startup_list' %}
+                                    {% endif %}
+                                "
+                            {% endif %}
+                        >
+                            <i class="bi bi-caret-left-fill"></i>
+                        </a>
+                        {% for number in pages_number %}
+                            <a class="btn btn-dark" href="{% if number is not 1 %}{% url 'startup_list' page=number %}{% else %}{% url 'startup_list' %}{% endif %}">{{ number }}</a>
+                        {% endfor %}
+                        <a class="btn btn-dark {% if not page.has_next %} disabled {% endif %}"
+                            {% if page.has_next %}
+                                href="
+                                    {% if page.next_page_number is not 1 %}
+                                        {% url 'startup_list' page=next_page_number %}
+                                    {% else %}
+                                        {% url 'startup_list' %}
+                                    {% endif %}
+                                "
+                            {% endif %}
+                        >
+                            <i class="bi bi-caret-right-fill"></i>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

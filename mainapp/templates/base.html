@@ -1,0 +1,160 @@
+{% include 'header.html' %}
+{% load static %}
+
+{% block content %}
+<section id="welcome-section" class="align-items-center d-flex" navbar-theme="light">
+    <div class="container-fluid about-us-container">
+        <div class="row pt-5">
+            <h2 class="text-center mt-5">Вітаємо у Startups NaUKMA!</h2>
+        </div>
+        <div class="row py-5 justify-content-center">
+            <div class="col-11 col-sm-5 col-xl-2 cu-card m-2">
+                <img src="{% static 'team.png' %}">
+                <p>Startups NaUKMA полегшує та пришвидшує пошук однодумців, для створення командних проектів у будь-яких галузях науки</p>
+            </div>
+            <div class="col-11 col-sm-5 col-xl-2 cu-card m-2">
+                <img src="{% static 'world.png' %}">
+                <p>Люди з різних куточків світу можуть побачити ваші розробки, та фінансово підтримати їх</p>
+            </div>
+            <div class="col-11 col-sm-5 col-xl-2 cu-card m-2">
+                <img src="{% static 'salary.png' %}">
+                <p>Проектами можуть зацікавитися інвестори та покупці - хороший шанс підзаробити власним розумом</p>
+            </div>
+            <div class="col-11 col-sm-5 col-xl-2 cu-card m-2">
+                <img src="{% static 'employee.png' %}">
+                <p>Роботодавці цікавляться вашими здобутками, тому Startups NaUKMA чудова платформа, де можуть бути розміщені усі ваші розробки</p>
+            </div>
+        </div>
+        <div class="row pb-5 px-1">
+            <div class="col-12 d-flex justify-content-center flex-wrap">
+                <a class="btn btn-lg btn-outline-light mx-1 mb-3 reference" refer-to="latest-startups">Переглянути останні стартапи</a>
+                <a class="btn btn-lg btn-outline-warning mx-1 mb-3 reference" refer-to="about-startups-naukma">Про Startups NaUKMA</a>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="latest-startups" navbar-theme="light">
+    <div class="container-fluid">
+        <div class="row pt-5 pb-3 justify-content-center">
+            <h2 class="section-title">Найновіші стартапи</h2>
+        </div>
+        <div class="row py-5 g-3 align-items-stretch justify-content-center startups-list">
+            {% for startup in startups %}
+                <div class="col-12 col-lg-6 col-xxl-4">
+                    <div class="cu-card h-100">
+                        <div class="header">
+                            <div class="startup-status">
+                                {{ startup.status_name }}
+                                <i class="bi bi-person-bounding-box ms-2"></i> x {{ startup.members.count }}
+                            </div>
+                            <img src="{% if not startup.image %}{% static 'startup-default.png' %}{% else %}{{ startup.image.url }}{% endif %}">
+                            <div class="header-info d-flex justify-content-between mt-3 flex-wrap">
+                                <div class="w-100 mb-3 title">
+                                    <h3 class="d-flex align-items-center">{{ startup.name }}</h3>
+                                </div>
+                                <div class="startup-tags col-12 col-md-8">
+                                    {% for startup_category in startup.categories.all %}
+                                        <span>{{ startup_category.name }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="budget col-12 col-md-4">
+                                    <p>Зібрано коштів: <span>{{ startup.budget }} грн.</span></p>
+                                </div>
+                                <div class="followers w-100 col-12">
+                                    <p>Кількість підписників: <span class="me-2 badge bg-light p-2" id="startup-{{ startup.id }}-followers">{{ startup.followers.count }}</span> {% if request.user in startup.followers.all %}(<i class="bi bi-person-check-fill px-1"></i> Ви підписані){% endif %}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="body pt-3">
+                            <p>{{ startup.short_description }}</p>
+                        </div>
+                        <div class="footer pt-3 d-flex flex-column">
+                            <div class="ft-row row gx-2 flex-wrap">
+                                <div class="col-12 col-md-6 d-flex mt-2">
+                                    <a class="btn btn-secondary w-100" href="{{ startup.get_absolute_url }}">Детальніше</a>
+                                </div>
+                                <div class="col-12 col-md-6 d-flex mt-2">
+                                    <a class="btn btn-warning w-100">Приєднатися до команди</a>
+                                </div>
+                            </div>
+                            <div class="ft-row row gx-2 flex-wrap">
+                                <div class="col-12 col-md-6 d-flex mt-2">
+                                    <a class="btn {% if request.user not in startup.followers.all %}btn-primary{% else %}btn-light{% endif %} w-100 follow-link" reference="{% url 'follow_startup' slug=startup.slug %}" startup-id="startup-{{ startup.id }}-followers">
+                                        {% if request.user not in startup.followers.all %}
+                                            Підписатися
+                                        {% else %}
+                                            Відписатися
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <div class="col-12 col-md-6 d-flex mt-2">
+                                    <a class="btn btn-success w-100">Зробити пожертву $</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="row pb-5">
+            <div class="col-12 d-flex justify-content-center">
+                <a class="btn btn-primary btn-lg" href="{% url 'startup_list' %}">Більше стартапів</a>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="about-startups-naukma" class="d-flex" navbar-theme="dark">
+    <div class="container-fluid">
+        <div class="row pt-5 justify-content-center">
+            <h2 class="text-center">Про Startups NaUKMA</h2>
+        </div>
+        <div class="row justify-content-between align-items-stretch pb-5">
+            <div class="col-12 col-xl-5 d-flex justify-content-center mt-5">
+                <div class="d-flex flex-column creator-info w-100">
+                    <div class="header">
+                        <h4 class="text-center mb-5">Розробник платформи</h4>
+                    </div>
+                    <div class="body w-100">
+                        <div class="d-flex w-100 justify-content-center mb-5">
+                            <img src="{% static 'me.png' %}">
+                        </div>
+                        <div class="d-flex w-100 justify-content-center">
+                            <p class="creator-message p-4">
+                                Привіт! Мене звати Сашко Ігумнов, я студент 1 курсу Національного університету "Києво-Могилянська академія". Я дуже зацікавлений роботою в команді, але при пошуку учасників виникають певні труднощі. Саме це підштовхнуло мене на створення цієї платформи, адже багато цікавих та корисних розробок не з'являються через відсутність команди або фінансової підтримки. Надіюсь, що Startups NaUKMA зробить великий внесок у розвиток перспективних проектів.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-xl-5 d-flex justify-content-center mt-5">
+                <div class="d-flex flex-column w-100">
+                    <div class="header">
+                        <h4 class="text-center mb-1">Залиште Ваш відгук</h4>
+                        <p class="text-center hint mb-5">Відгуки відіграють важливу роль для розвитку цієї платформи.</p>
+                    </div>
+                    <div class="body w-100">
+                        <form action="POST" id="feedback-form" class="p-4">
+                            {% csrf_token %}
+                            <label for="feedback-username" class="form-label">Ваше ім'я <span class="field-required">*</span></label>
+                            <div class="form-group">
+                                <input type="text" id="feedback-username" class="w-100 advanced-right" name="">
+                                <span class="field-after"><i class="bi bi-text-center"></i></span>
+                            </div>
+                            <label for="feedback-comment" class="form-label">Текст відгуку <span class="field-required">*</span></label>
+                            <div class="form-group">
+                                <textarea name="" id="feedback-comment" class="w-100 advanced-right"></textarea>
+                                <span class="field-after"><i class="bi bi-chat-left-text"></i></span>
+                            </div>
+                            <div class="form-group justify-content-center">
+                                <a class="btn btn-warning w-100 submit">Надіслати</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% include 'footer.html' %}
