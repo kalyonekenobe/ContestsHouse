@@ -138,6 +138,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STATICFILES_DIRS = (
+    BASE_DIR / 'static_dev/extensions',
     BASE_DIR / 'static_dev/css',
     BASE_DIR / 'static_dev/scripts',
 )

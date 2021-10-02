@@ -59,7 +59,7 @@
                                     <p>Зібрано коштів: <span>{{ startup.budget }} грн.</span></p>
                                 </div>
                                 <div class="followers w-100 col-12">
-                                    <p>Кількість підписників: <span class="me-2 badge bg-light p-2" id="startup-{{ startup.id }}-followers">{{ startup.followers.count }}</span> {% if request.user in startup.followers.all %}(<i class="bi bi-person-check-fill px-1"></i> Ви підписані){% endif %}</p>
+                                    <p>Кількість підписників: <span class="me-2 badge bg-light p-2" id="startup-{{ startup.id }}-followers">{{ startup.followers.count }}</span></p>
                                 </div>
                             </div>
                         </div>
@@ -69,15 +69,15 @@
                         <div class="footer pt-3 d-flex flex-column">
                             <div class="ft-row row gx-2 flex-wrap">
                                 <div class="col-12 col-md-6 d-flex mt-2">
-                                    <a class="btn btn-secondary w-100" href="{{ startup.get_absolute_url }}">Детальніше</a>
+                                    <a class="btn w-100 details" href="{{ startup.get_absolute_url }}">Детальніше</a>
                                 </div>
                                 <div class="col-12 col-md-6 d-flex mt-2">
-                                    <a class="btn btn-warning w-100">Приєднатися до команди</a>
+                                    <a class="btn btn-warning w-100 {% if request.user.is_anonymous %}disabled{% endif %}">Приєднатися до команди</a>
                                 </div>
                             </div>
                             <div class="ft-row row gx-2 flex-wrap">
                                 <div class="col-12 col-md-6 d-flex mt-2">
-                                    <a class="btn {% if request.user not in startup.followers.all %}btn-primary{% else %}btn-light{% endif %} w-100 follow-link" reference="{% url 'follow_startup' slug=startup.slug %}" startup-id="startup-{{ startup.id }}-followers">
+                                    <a class="btn {% if request.user.is_anonymous %}disabled{% endif %} {% if request.user not in startup.followers.all %}btn-primary{% else %}btn-light{% endif %} w-100 follow-link" reference="{% url 'follow_startup' slug=startup.slug %}" startup-id="startup-{{ startup.id }}-followers">
                                         {% if request.user not in startup.followers.all %}
                                             Підписатися
                                         {% else %}
@@ -86,7 +86,7 @@
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-6 d-flex mt-2">
-                                    <a class="btn btn-success w-100">Зробити пожертву $</a>
+                                    <a class="btn btn-success w-100">Зробити пожертву <i class="bi bi-cash-stack ms-2"></i></a>
                                 </div>
                             </div>
                         </div>

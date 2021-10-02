@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-{% load filters %}
 {% load static %}
+{% load filters %}
 
 {% block content %}
 <section id="startup-detail" navbar-theme="light">
@@ -14,34 +14,30 @@
                 <a class="inactive">{{ startup.name }}</a>
             </nav>
         </div>
-        <div class="row py-4 mb-2 px-1">
+        <div class="row py-2 align-items-stretch startup-title">
             <h2>{{ startup.name }}</h2>
+            <nav>
+                <a><i class="bi bi-grid-1x2 me-2"></i></i>Загальні відомості</a>
+                <a><i class="bi bi-layout-text-sidebar-reverse me-2"></i>Детальний опис</a>
+                <a><i class="bi bi-menu-button-wide-fill me-2"></i>Коментарі</a>
+            </nav>
         </div>
-        <div class="row">
-            <div class="col-12 col-lg-5 col-xl-4 mb-5">
+        <div class="row align-items-stretch">
+            <div class="col-12 col-lg-6 mb-4">
                 <img src="{% if startup.image %}{{ startup.image.url }}{% else %}{% static 'startup-default.png' %}{% endif %}" alt="">
-                <div class="pt-1 d-flex flex-column">
-                    <div class="header-info d-flex justify-content-between mt-3 flex-wrap">
-                        <div class="startup-tags col-12 col-md-8">
-                            {% for startup_category in startup.categories.all %}
-                                <span>{{ startup_category.name }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="budget col-12 col-md-4">
-                            <p>Зібрано коштів: <span>{{ startup.budget }} грн.</span></p>
-                        </div>
-                        <div class="followers w-100 col-12">
-                            <p>Кількість підписників: <span class="me-2 badge bg-light p-2" id="startup-{{ startup.id }}-followers">{{ startup.followers.count }}</span> {% if request.user in startup.followers.all %}(<i class="bi bi-person-check-fill px-1"></i> Ви підписані){% endif %}</p>
+                <div class="d-flex flex-wrap statistic-info justify-content-center my-4">
+                    <div class="members col-6 col-sm-4 d-flex justify-content-center py-3">
+                        <div class="statistic-group">
+                            <span>{{ startup.members.count }}</span>
+                            <p>Учасники</p>
+                            <a class="btn mt-3 btn-warning w-100 {% if request.user.is_anonymous %}disabled{% endif %}">Приєднатися</a>
                         </div>
                     </div>
-                    <div class="ft-row row gx-2 flex-wrap">
-                        <div class="col-12 d-flex mt-2">
-                            <a class="btn btn-warning w-100">Приєднатися до команди</a>
-                        </div>
-                    </div>
-                    <div class="ft-row row gx-2 flex-wrap">
-                        <div class="col-12 col-md-6 d-flex mt-2">
-                            <a class="btn {% if request.user not in startup.followers.all %}btn-primary{% else %}btn-light{% endif %} w-100 follow-link" reference="{% url 'follow_startup' slug=startup.slug %}" startup-id="startup-{{ startup.id }}-followers">
+                    <div class="followers col-6 col-sm-4 d-flex justify-content-center py-3">
+                        <div class="statistic-group">
+                            <span id="startup-{{ startup.id }}-followers">{{ startup.followers.count }}</span>
+                            <p>Підписники</p>
+                            <a class="btn mt-3 {% if request.user.is_anonymous %}disabled{% endif %} {% if request.user not in startup.followers.all %}btn-primary{% else %}btn-light{% endif %} w-100 follow-link" reference="{% url 'follow_startup' slug=startup.slug %}" startup-id="startup-{{ startup.id }}-followers">
                                 {% if request.user not in startup.followers.all %}
                                     Підписатися
                                 {% else %}
@@ -49,13 +45,69 @@
                                 {% endif %}
                             </a>
                         </div>
-                        <div class="col-12 col-md-6 d-flex mt-2">
-                            <a class="btn btn-success w-100">Зробити пожертву $</a>
+                    </div>
+                    <div class="budget col-6 col-sm-4 d-flex justify-content-center py-3">
+                        <div class="statistic-group">
+                            <span>{{ startup.budget }} грн.</span>
+                            <p>Зібрано коштів</p>
+                            <a class="btn mt-3 btn-success w-100">Пожертвувати</a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-7 col-xxl-8 startup-description px-3">
+            <div class="col-12 col-lg-6 d-flex align-items-stretch mb-4">
+                <div class="startup-additional-info w-100">
+                    <div class="col-12 d-flex justify-content-center align-items-start">
+                        <p class="title">Учасники</p>
+                    </div>
+                    <div class="col-12 d-flex flex-wrap justify-content-center">
+                        {% for member in startup.members.all %}
+                            <div class="col-12 col-sm-6 startup-creator">
+                                <img src="{{ member.image.url }}" alt="">
+                                <p>{{ member.role }}</p>
+                                <h6>{{ member.get_full_name }}</h6>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-12 additional-info d-flex flex-wrap">
+                        <div class="col-sm-6">
+                            <div class="col-12 text-center">
+                                <p>Категорії, до яких відноситься:</p>
+                            </div>
+                            <div class="startup-tags col-12 d-inline-flex flex-wrap mb-4 justify-content-center">
+                                {% for startup_category in startup.categories.all %}
+                                    <span>{{ startup_category.name }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="col-12 text-center">
+                                <p>Вкладені файли:</p>
+                            </div>
+                            <div class="col-12 d-inline-flex flex-wrap mb-4">
+                                <div class="flex-wrap attached-files">
+                                    {% for attached_file in startup.files.all %}
+                                        <div class="form-file" tooltip="Назва файлу: {{ attached_file.name }}">
+                                            <img src="{% static attached_file.extension|get_file_extension_image %}">
+                                           <span>
+                                               <a href='{{ attached_file.file.url }}' target='_blank'>
+                                                   {{ attached_file.name }}
+                                               </a>
+                                           </span>
+                                       </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center pb-5">
+            <h2 class="section-title">Інформація про стартап</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-xxl-8 startup-description px-3">
                 <div>
                     {{ startup.description|safe }}
                 </div>
@@ -67,19 +119,23 @@
         <div class="row justify-content-center pb-5">
             <div class="col-12 col-xxl-8">
                 <a class="btn btn-warning" id="create-comment">Додати коментар <i class="bi bi-pen ms-2"></i></a>
-                <form action="POST" id="comment-form" class="my-3 d-none">
+                <form enctype="multipart/form-data" action="POST" id="comment-form" class="my-3 d-none">
                     {% csrf_token %}
                     <input type="hidden" id="reply-to">
                     <h5 class="mb-4">Додати коментар</h5>
-                    <label for="comment-author" class="form-label">Ваше ім'я або нікнейм <span class="field-required">*</span></label>
+                    <label for="comment-author" class="form-label">Ваше ім'я або нікнейм: <span class="field-required">*</span></label>
                     <div class="form-group">
                         {{ comment_form.author }}
                         <span class="field-after"><i class="bi bi-file-person"></i></span>
                     </div>
-                    <label for="comment-text" class="form-label">Коментар <span class="field-required">*</span></label>
+                    <label for="comment-text" class="form-label">Коментар: <span class="field-required">*</span></label>
                     <div class="form-group">
                         {{ comment_form.text }}
                         <span class="field-after"><i class="bi bi-chat-left-text"></i></span>
+                    </div>
+                    <label class="form-label d-none" id="attached-files-label">Прикріплені файли:</label>
+                    <div class="form-group d-none flex-wrap" id="attached-files-container">
+                        <input type="file" id="attached-files" name="files[]" class="d-none" multiple>
                     </div>
                     <div class="form-group ft-row row g-2">
                         <div class="col-12 col-lg-3">
@@ -94,7 +150,7 @@
                     </div>
                 </form>
             </div>
-            <div class="col-12 col-xxl-8">
+            <div class="col-12 col-xxl-8" id="startup-comments">
                 {{ startup|startup_comments }}
             </div>
         </div>

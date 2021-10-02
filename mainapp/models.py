@@ -30,6 +30,23 @@ class Category(models.Model):
         return f"Категорія: { self.name }"
 
 
+class StartupMember(models.Model):
+    
+    user = models.ForeignKey(User, verbose_name='Користувач', on_delete=models.CASCADE)
+    middle_name = models.CharField(max_length=64, verbose_name='По-батькові', blank=True)
+    phone = models.CharField(max_length=32, verbose_name="Номер телефону", blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    date_of_accession = models.DateTimeField(default=timezone.now)
+    image = models.ImageField(verbose_name="Зображення", blank=True)
+    role = models.CharField(max_length=255, verbose_name="Роль у стартапі")
+    
+    def __str__(self):
+        return f"{self.user.last_name} {self.user.first_name} {self.middle_name}: {self.role}"
+    
+    def get_full_name(self):
+        return f"{self.user.last_name} {self.user.first_name} {self.middle_name}"
+
+
 class Feedback(models.Model):
     
     username = models.CharField(max_length=255, verbose_name="Ім'я користувача")
@@ -107,7 +124,7 @@ class Startup(models.Model):
     description = models.TextField(verbose_name="Опис")
     categories = models.ManyToManyField(Category, verbose_name="Категорії, до яких відноситься проект", related_name='related_categories')
     creator = models.ForeignKey(User, verbose_name='Автор', on_delete=models.CASCADE)
-    members = models.ManyToManyField(User, verbose_name="Учасники", related_name='related_members', blank=True)
+    members = models.ManyToManyField(StartupMember, verbose_name="Учасники", related_name='related_members', blank=True)
     status = models.CharField(max_length=32, verbose_name="Статус", choices=STATUS_CHOICES, default=STATUS_TEAM_SET)
     datetime = models.DateTimeField(verbose_name="Дата та час створення", default=timezone.now)
     followers = models.ManyToManyField(User, verbose_name="Підписники", related_name='related_followers', blank=True)

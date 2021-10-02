@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.views.generic import DetailView, View
 from django.http import HttpResponseRedirect, HttpResponse
+from mainapp.template_tags.filters import *
 from .forms import *
 from .utils import *
 
@@ -74,15 +75,17 @@ class FollowStartupView(View):
     def post(self, request, *args, **kwargs):
         user = request.user
         startup = Startup.objects.get(slug=kwargs.get('slug'))
-        if user not in startup.followers.all():
-            startup.followers.add(user)
-            http_response = 'follow'
-        else:
-            startup.followers.remove(user)
-            http_response = 'unfollow'
-        startup.save()
+        http_response = 406
+        if not user.is_anonymous:
+            if user not in startup.followers.all():
+                startup.followers.add(user)
+                http_response = 'follow'
+            else:
+                startup.followers.remove(user)
+                http_response = 'unfollow'
+            startup.save()
         data = {
-            'action': http_response,
+            'http_response': http_response,
             'followers_quantity': startup.followers.count(),
         }
         return HttpResponse(json.dumps(data))
@@ -94,27 +97,36 @@ class CreateCommentView(View):
     def post(self, request, *args, **kwargs):
         startup = Startup.objects.get(slug=kwargs.get('slug'))
         http_response = 201
-        data = json.loads(request.body)
-        data['reply_to'] = base64.b64decode(data['reply_to'].encode('ascii')).decode('ascii')
+        data = request.POST
+        data._mutable = True
+        data['reply_to'] = decode_value(data['reply_to'], 'ascii')
+        data['attached_files'] = request.FILES.getlist('attached_files')
         form = CommentForm(data or None)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.username = form.cleaned_data['author']
             comment.text = form.cleaned_data['text']
             comment.user_ip = get_client_ip(request)
-            attached_files = data['attached_files']
-            for attached_file in attached_files:
-                file = File.objects.create(attached_file.name, attached_file)
-                comment.attached_files.add(file)
             comment.save()
             if data['reply_to']:
                 comment_parent = Comment.objects.get(id=data['reply_to'])
                 if comment_parent:
                     comment_parent.children.add(comment)
                     comment_parent.save()
+            attached_files = data['attached_files']
+            for attached_file in attached_files:
+                file = File.objects.create(name=attached_file.name, file=attached_file)
+                comment.attached_files.add(file)
+            comment.save()
             startup.comments.add(comment)
             startup.save()
         else:
             http_response = 406
-        return HttpResponse(json.dumps(http_response))
+        
+        data = {
+            'response_code': http_response,
+            'comment_tree': startup_comments(startup),
+        }
+        
+        return HttpResponse(json.dumps(data))
     
